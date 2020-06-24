@@ -7,6 +7,8 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var apiUsersRouter = require('./routes/api/users');
+var LocalStrategy = require('passport-local').Strategy;
+var Users = require('./models/users');
 
 var app = express();
 
@@ -52,6 +54,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/api/users', apiUsersRouter);
+passport.use(Users.createStrategy());
 
 passport.serializeUser(function(user, done){
   done(null,{
