@@ -15,6 +15,12 @@ var Users = new Schema({
     required: [true, 'Please enter a username'],
     unique: [true, 'Usernames must be unique']
   },
+  first_name: String,
+  last_name: String,
+  admin: {
+    type: Boolean,
+    default: false
+  },
   hash: {
     type: String,
     required: [
@@ -29,11 +35,6 @@ var Users = new Schema({
       'There was a problem creating your password'
     ]
   },
-  first_name: String,
-  last_name: String,
-  admin: {
-    type: Boolean,
-    default: false,
   created: {
     type: Date,
     default: Date.now
@@ -41,8 +42,8 @@ var Users = new Schema({
   modified: {
     type: Date,
     default: Date.now
-  }  
   }
+
 });
 
 Users.pre('save', function(next){

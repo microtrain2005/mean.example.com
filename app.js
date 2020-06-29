@@ -1,14 +1,21 @@
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
+var passport = require('passport');
+
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+
+var session = require('express-session');
+var MongoStore = require('connect-mongo')(session);
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
+var Users = require('./models/users');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var apiUsersRouter = require('./routes/api/users');
-var LocalStrategy = require('passport-local').Strategy;
-var Users = require('./models/users');
+var apiAuthRouter = require('./routes/api/auth');
 
 var app = express();
 
@@ -17,9 +24,7 @@ var mongoose = require('mongoose');
 
 //Connect to MongoDB
 mongoose.connect(config.mongodb, { useNewUrlParser: true });
-
-//Test the file
-// console.log(config);
+// mongoose.set('useNewUrlParser', true);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -29,6 +34,8 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(require('express-session')({
   //Define the session store
   store: new MongoStore({
@@ -49,13 +56,7 @@ app.use(require('express-session')({
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/api/users', apiUsersRouter);
 passport.use(Users.createStrategy());
-
 passport.serializeUser(function(user, done){
   done(null,{
     id: user._id,
@@ -69,6 +70,11 @@ passport.serializeUser(function(user, done){
 passport.deserializeUser(function(user, done){
   done(null, user);
 });
+
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
+app.use('/api/users', apiUsersRouter);
+app.use('/api/auth', apiAuthRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
