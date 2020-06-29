@@ -3,8 +3,8 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  // res.send('respond with a resource');
-  res.render('index', { title: 'Express', name: 'MicroTrain2005'});
+  console.log(req.session);
+  res.render('index', { title: 'Express' });
 });
 
 module.exports = router;
