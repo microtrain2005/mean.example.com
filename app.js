@@ -6,9 +6,6 @@ var passport = require('passport');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var session = require('express-session');
-var MongoStore = require('connect-mongo')(session);
-var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var Users = require('./models/users');
 
@@ -22,10 +19,9 @@ var app = express();
 
 var config = require('./config.dev');
 var mongoose = require('mongoose');
-
-//Connect to MongoDB
-mongoose.connect(config.mongodb, { useNewUrlParser: true });
-// mongoose.set('useNewUrlParser', true);
+var session = require('express-session');
+var MongoStore = require('connect-mongo')(session);
+var passport = require('passport');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -51,7 +47,8 @@ app.use(require('express-session')({
     domain: config.cookie.domain,
     //httpOnly: true,
     //secure: true,
-    maxAge:3600000 //1 hour
+    // maxAge:3600000 //1 hour
+    maxAge:7200000 //2 hour
   }
 }));
 app.use(passport.initialize());
@@ -80,7 +77,7 @@ app.use(function(req,res,next){
 //Session-based access control
 app.use(function(req,res,next){
   //Uncomment the following line to allow access to everything.
-  // return next();
+  return next();
 
   //Allow any endpoint that is an exact match. The server does not
   //have access to the hash so /auth and /auth#xxx would bot be considered 
@@ -124,11 +121,11 @@ app.use(function(req,res,next){
   return res.redirect('/auth#login');
 });
 
-app.use('/auth', authRouter);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/api/users', apiUsersRouter);
 app.use('/api/auth', apiAuthRouter);
+app.use('/auth', authRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -145,5 +142,9 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+//Connect to MongoDB
+mongoose.connect(config.mongodb, { useNewUrlParser: true });
+// mongoose.set('useNewUrlParser', true);
 
 module.exports = app;
