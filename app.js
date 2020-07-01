@@ -1,19 +1,16 @@
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
-var passport = require('passport');
-
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var LocalStrategy = require('passport-local').Strategy;
-var Users = require('./models/users');
-
-var authRouter = require('./routes/auth');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var apiUsersRouter = require('./routes/api/users');
+var LocalStrategy = require('passport-local').Strategy;
+var Users = require('./models/users');
 var apiAuthRouter = require('./routes/api/auth');
+var authRouter = require('./routes/auth');
 
 var app = express();
 
@@ -47,7 +44,6 @@ app.use(require('express-session')({
     domain: config.cookie.domain,
     //httpOnly: true,
     //secure: true,
-    // maxAge:3600000 //1 hour
     maxAge:7200000 //2 hour
   }
 }));
@@ -55,6 +51,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.use(Users.createStrategy());
+
 passport.serializeUser(function(user, done){
   done(null,{
     id: user._id,
@@ -69,15 +66,29 @@ passport.deserializeUser(function(user, done){
   done(null, user);
 });
 
+
 app.use(function(req,res,next){
   res.locals.session = req.session;
   next();
 });
 
+//Set up CORS
+app.use(function(req, res, next) {
+  res.header('Access-Control-Allow-Credentials', true);
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
+  if ('OPTIONS' == req.method) {
+    res.send(200);
+  } else {
+    next();
+  }
+});
+
 //Session-based access control
 app.use(function(req,res,next){
   //Uncomment the following line to allow access to everything.
-  return next();
+  // return next();
 
   //Allow any endpoint that is an exact match. The server does not
   //have access to the hash so /auth and /auth#xxx would bot be considered 
