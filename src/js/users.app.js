@@ -207,7 +207,7 @@ var usersApp = (function() {
           </div>
           <div>
           <a href="#delete-${data.user._id}" class="text-danger">Delete</a>
-        </div>
+          </div>
           `;
       
         app.innerHTML=form;
@@ -267,6 +267,10 @@ var usersApp = (function() {
     
         card = `<div class="card bg-transparent border-danger text-danger bg-danger">
           <div class="card-header bg-transparent border-danger">
+          <div class="float-right">
+          <a href="#" class="btn btn-primary">Cancel</a>
+        </div>
+
             <h2 class="h3 text-center">Your About to Delete a User</h2>
           </div>
           <div class="card-body text-center">
@@ -280,9 +284,9 @@ var usersApp = (function() {
     
             <div class="text-center">
               <br>
-              <a class="btn btn-lg btn-danger text-white">
-                Yes delete ${data.user.username}
-              </a>
+              <a onclick="usersApp.deleteUser('${data.user._id}');" class="btn btn-lg btn-danger text-white">
+              Yes delete ${data.user.username}
+            </a>
             </div>
     
           </div>
@@ -292,7 +296,32 @@ var usersApp = (function() {
       }
     }
 
-    return {
+    function deleteUser(id){
+
+      let uri = `${window.location.origin}/api/users/${id}`;
+      let xhr = new XMLHttpRequest();
+      xhr.open('DELETE', uri);
+    
+      xhr.setRequestHeader(
+        'Content-Type',
+        'application/json; charset=UTF-8'
+      );
+    
+      xhr.send();
+    
+      xhr.onload = function(){
+        let data = JSON.parse(xhr.response);
+        if(data.success === true){
+          window.location.hash = '#';
+        }else{
+          alert('Unknown error, the user could not be deleted');
+        }
+    
+      }
+    
+    }
+
+      return {
       load: function(){
         let hash = window.location.hash;
         let hashArray = hash.split('-');
@@ -319,9 +348,18 @@ var usersApp = (function() {
             viewUsers();
             break;
         }
+      },
+
+      deleteUser: function(id){
+        deleteUser(id);
       }
     }
   
   })();
   
   usersApp.load();
+
+  window.addEventListener("hashchange", function(){
+    usersApp.load();
+  });
+  
