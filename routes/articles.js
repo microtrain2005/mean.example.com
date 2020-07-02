@@ -18,15 +18,16 @@ router.get('/', function(req, res, next) {
   });
 });
 
-router.get('/view/:slug', function(req, res, next) {
-  Articles.findOne({slug:req.params.slug},function(err, articles){
+router.get('/:slug', function(req, res, next) {
+  Articles.findOne({'slug':req.params.slug},function(err, articles){
     if(err)
     {
       return handleError(err);
     }
     else{
-      return res.render('articles/view', { title: 'Selected Article' , article:articles});
-    }
+    // return res.json({'success':true, 'article': article});
+    return res.render('articles/view', { title: 'Articles' , article:articles});
+  }
   });
 });
 
