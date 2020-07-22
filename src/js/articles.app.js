@@ -143,9 +143,6 @@ var articlesApp = (function () {
       card = `<div class="card">
         <div class="card-header clearfix">
           <h2 class="h3 float-left">${data.article.title}</h2>
-          <div class="float-right">
-            <a href="#edit-${data.article._id}" class="btn btn-primary">Edit</a>
-          </div>
         </div>
         <div class="card-body">
           <div class="blockquote">${data.article.body}</div>
@@ -183,6 +180,9 @@ var articlesApp = (function () {
       card = `<div class="card">
         <div class="card-header clearfix">
           <h2 class="h3 float-left">${data.article.title}</h2>
+          <div class="float-right">
+            <a href="#edit-${data.article._id}" class="btn btn-primary">Edit</a>
+          </div>
         </div>
         <div class="card-body">
           <div class="blockquote">${data.article.body}</div>
@@ -214,7 +214,7 @@ var articlesApp = (function () {
       let app = document.getElementById('app');
       let data = JSON.parse(xhr.response);
       var date = Date(data.article.published);
-      console.log(date);
+      // console.log(date);
       var form = `
         <div class="card">
           <div class="card-header clearfix">
